@@ -105,8 +105,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable()), toTraced(new TestCallable())), 1,
-        TimeUnit.SECONDS);
+    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable())), 1, TimeUnit.SECONDS);
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -119,12 +118,11 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable()), toTraced(new TestCallable())));
+    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable())));
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
   }
-
 
 }
