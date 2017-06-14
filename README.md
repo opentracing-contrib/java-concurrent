@@ -1,12 +1,12 @@
 [![Build Status][ci-img]][ci] [![Released Version][maven-img]][maven]
 
 # OpenTracing Instrumentation for `java.util.concurrent`
-OpenTracing instrumentation for `java.util.concurrent` package. In instruments `ExecutorService`,
+OpenTracing instrumentation for `java.util.concurrent` package. It instruments `ExecutorService`,
 `Runnable` and `Callable`.
 
 ## Configuration
 ```java
-ExecutorService executorService = TracedExecutorService(Executors.newFixedThreadPool(4), tracer);
+ExecutorService executorService = new TracedExecutorService(Executors.newFixedThreadPool(4), tracer);
 ```
 
 ## Development
