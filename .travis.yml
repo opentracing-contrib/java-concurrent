@@ -1,0 +1,35 @@
+sudo: required
+dist: trusty
+
+language: java
+jdk:
+- oraclejdk8
+
+cache:
+  directories:
+  - $HOME/.m2/repository
+
+before_install:
+  # allocate commits to CI, not the owner of the deploy key
+  - git config user.name "opentracingci"
+  - git config user.email "opentracingci+opentracing@googlegroups.com"
+
+  # setup https authentication credentials, used by ./mvnw release:prepare
+  - git config credential.helper "store --file=.git/credentials"
+  - echo "https://$GH_TOKEN:@github.com" > .git/credentials
+
+
+script:
+  - mvn test
+
+branches:
+  except:
+    - /^[0-9]/
+
+env:
+  global:
+  # Ex. travis encrypt -r org/repo GH_TOKEN=XXX-https://github.com/settings/tokens-XXX
+  # Ex. travis encrypt -r org/repo SONATYPE_USER=your_sonatype_account
+  # Ex. travis encrypt -r org/repo SONATYPE_PASSWORD=your_sonatype_password
+  # Ex. travis encrypt -r org/repo BINTRAY_USER=your_github_account
+  # Ex. travis encrypt -r org/repo BINTRAY_KEY=xxx-https://bintray.com/profile/edit-xxx
