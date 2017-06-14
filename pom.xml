@@ -11,9 +11,9 @@
   <url>https://github.com/opentracing-contrib/java-concurrent</url>
 
   <scm>
-    <url>https://github.com/opentracing-contrib/java-okhttp</url>
-    <connection>scm:git:https://github.com/opentracing-contrib/java-okhttp.git</connection>
-    <developerConnection>scm:git:https://github.com/opentracing-contrib/java-okhttp.git</developerConnection>
+    <url>https://github.com/opentracing-contrib/java-concurrent</url>
+    <connection>scm:git:https://github.com/opentracing-contrib/java-concurrent.git</connection>
+    <developerConnection>scm:git:https://github.com/opentracing-contrib/java-concurrent.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -38,8 +38,8 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <version.junit>4.12</version.junit>
     <version.io.opentracing>0.30.0</version.io.opentracing>
-    <version.org.awaitility-awaitility>3.0.0</version.org.awaitility-awaitility>
 
     <!-- plugins -->
     <version.maven-deploy-plugin>2.8.2</version.maven-deploy-plugin>
@@ -88,7 +88,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -106,7 +106,7 @@
   <distributionManagement>
     <repository>
       <id>bintray</id>
-      <url>https://api.bintray.com/maven/opentracing/maven/opentracing-okhttp/;publish=1</url>
+      <url>https://api.bintray.com/maven/opentracing/maven/opentracing-concurrent/;publish=1</url>
     </repository>
     <snapshotRepository>
       <id>jfrog-snapshots</id>
@@ -144,7 +144,7 @@
         <configuration>
           <subject>opentracing</subject>
           <repo>maven</repo>
-          <packageName>opentracing-okhttp</packageName>
+          <packageName>opentracing-concurrent</packageName>
         </configuration>
       </plugin>
     </plugins>
