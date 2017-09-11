@@ -2,15 +2,22 @@ package io.opentracing.contrib.concurrent;
 
 import static org.junit.Assert.assertEquals;
 
-import io.opentracing.mock.MockSpan;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+
 import org.junit.Test;
+
+import io.opentracing.mock.MockSpan;
 
 /**
  * @author Pavol Loffay
  */
 public class TracedCallableTest extends AbstractConcurrentTest {
+
+  protected <V> Callable<V> toTraced(Callable<V> callable) {
+    return new TracedCallable<V>(callable, mockTracer.activeSpan());
+  }
 
   @Test
   public void testTracedCallable() throws InterruptedException, ExecutionException {

@@ -1,6 +1,5 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.Tracer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,17 +10,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import io.opentracing.Tracer;
+
 /**
  * @author Pavol Loffay
  */
-public class TracedExecutorService implements ExecutorService {
+public class TracedExecutorService extends TracedExecutor implements ExecutorService {
 
   private final ExecutorService delegate;
-  private final Tracer tracer;
 
   public TracedExecutorService(ExecutorService delegate, Tracer tracer) {
+    super(delegate, tracer);
     this.delegate = delegate;
-    this.tracer = tracer;
   }
 
   @Override
@@ -86,11 +86,6 @@ public class TracedExecutorService implements ExecutorService {
   public <T> T invokeAny(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit)
       throws InterruptedException, ExecutionException, TimeoutException {
     return delegate.invokeAny(toTraced(collection), l, timeUnit);
-  }
-
-  @Override
-  public void execute(Runnable runnable) {
-    delegate.execute(new TracedRunnable(runnable, tracer.activeSpan()));
   }
 
   private <T> Collection<? extends Callable<T>> toTraced(Collection<? extends Callable<T>> delegate) {
