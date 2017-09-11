@@ -2,14 +2,15 @@ package io.opentracing.contrib.concurrent;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
+
+import org.junit.Before;
+
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.ThreadLocalActiveSpanSource;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.FutureTask;
-import org.junit.Before;
 
 /**
  * @author Pavol Loffay
@@ -65,18 +66,6 @@ public abstract class AbstractConcurrentTest {
         assertEquals(parent.context().spanId(), child.parentId());
       }
     }
-  }
-
-  protected Runnable toTraced(Runnable runnable) {
-    return new TracedRunnable(runnable, mockTracer.activeSpan());
-  }
-
-  public <V> Callable<V> toTraced(Callable<V> callable) {
-    return new TracedCallable<V>(callable, mockTracer.activeSpan());
-  }
-
-  public ExecutorService toTraced(ExecutorService executorService) {
-    return new TracedExecutorService(executorService, mockTracer);
   }
 
   protected Thread createThread(Runnable runnable) {

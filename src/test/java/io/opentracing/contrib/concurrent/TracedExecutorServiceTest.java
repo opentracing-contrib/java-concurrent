@@ -2,7 +2,6 @@ package io.opentracing.contrib.concurrent;
 
 import static org.junit.Assert.assertEquals;
 
-import io.opentracing.mock.MockSpan;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -10,7 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.junit.Test;
+
+import io.opentracing.mock.MockSpan;
 
 /**
  * @author Pavol Loffay
@@ -18,13 +20,17 @@ import org.junit.Test;
 public class TracedExecutorServiceTest extends AbstractConcurrentTest {
   private static final int NUMBER_OF_THREADS = 4;
 
+  protected ExecutorService toTraced(ExecutorService executorService) {
+    return new TracedExecutorService(executorService, mockTracer);
+  }
+
   @Test
   public void testExecuteRunnable() throws InterruptedException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.execute(toTraced(new TestRunnable()));
+    executorService.execute(new TestRunnable());
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -37,7 +43,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.submit(toTraced(new TestRunnable()));
+    executorService.submit(new TestRunnable());
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -50,7 +56,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.submit(toTraced(new TestRunnable()), new Object());
+    executorService.submit(new TestRunnable(), new Object());
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -63,7 +69,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.submit(toTraced(new TestCallable()));
+    executorService.submit(new TestCallable());
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -77,7 +83,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
     countDownLatch = new CountDownLatch(2);
-    executorService.invokeAll(Arrays.asList(toTraced(new TestCallable()), toTraced(new TestCallable())));
+    executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()));
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -91,8 +97,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
     countDownLatch = new CountDownLatch(2);
-    executorService.invokeAll(Arrays.asList(toTraced(new TestCallable()), toTraced(new TestCallable())), 1,
-        TimeUnit.SECONDS);
+    executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()), 1, TimeUnit.SECONDS);
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -105,7 +110,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable())), 1, TimeUnit.SECONDS);
+    executorService.invokeAny(Arrays.asList(new TestCallable()), 1, TimeUnit.SECONDS);
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
@@ -118,7 +123,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
     mockTracer.makeActive(parentSpan);
-    executorService.invokeAny(Arrays.asList(toTraced(new TestCallable())));
+    executorService.invokeAny(Arrays.asList(new TestCallable()));
 
     countDownLatch.await();
     assertParentSpan(parentSpan);
