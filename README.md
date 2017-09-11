@@ -1,7 +1,7 @@
 [![Build Status][ci-img]][ci] [![Released Version][maven-img]][maven]
 
-# OpenTracing Instrumentation for `java.util.concurrent`
-OpenTracing instrumentation for `java.util.concurrent` package. It instruments `ExecutorService`,
+# OpenTracing instrumentation for `java.util.concurrent`
+OpenTracing instrumentation for `java.util.concurrent` package. It instruments `ExecutorService`, `Executor`,
 `Runnable` and `Callable`.
 
 ## Configuration
