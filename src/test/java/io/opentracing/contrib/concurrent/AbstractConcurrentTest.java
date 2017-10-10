@@ -10,7 +10,7 @@ import org.junit.Before;
 
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
-import io.opentracing.util.ThreadLocalActiveSpanSource;
+import io.opentracing.util.ThreadLocalScopeManager;
 
 /**
  * @author Pavol Loffay
@@ -45,7 +45,7 @@ public abstract class AbstractConcurrentTest {
   }
 
   protected CountDownLatch countDownLatch = new CountDownLatch(0);
-  protected MockTracer mockTracer = new MockTracer(new ThreadLocalActiveSpanSource());
+  protected MockTracer mockTracer = new MockTracer(new ThreadLocalScopeManager());
 
   @Before
   public void before() {
