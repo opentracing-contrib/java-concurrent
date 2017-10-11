@@ -10,18 +10,18 @@ import io.opentracing.Span;
 public class TracedRunnable implements Runnable {
 
   private final Runnable delegate;
-  private final Span continuation;
+  private final Span span;
   private final Tracer tracer;
 
   public TracedRunnable(Runnable delegate, Tracer tracer) {
     this.delegate = delegate;
     this.tracer = tracer;
-    this.continuation = tracer.scopeManager().active() == null ? null : tracer.scopeManager().active().span();
+    this.span = tracer.scopeManager().active() == null ? null : tracer.scopeManager().active().span();
   }
 
   @Override
   public void run() {
-    Scope scope = continuation == null ? null : tracer.scopeManager().activate(continuation, false);
+    Scope scope = span == null ? null : tracer.scopeManager().activate(span, false);
     try {
       delegate.run();
     } finally {

@@ -12,18 +12,18 @@ import java.util.concurrent.Callable;
 public class TracedCallable<V> implements Callable<V> {
 
   private final Callable<V> delegate;
-  private final Span continuation;
+  private final Span span;
   private final Tracer tracer;
 
   public TracedCallable(Callable<V> delegate, Tracer tracer) {
     this.delegate = delegate;
     this.tracer = tracer;
-    this.continuation = tracer.scopeManager().active() == null ? null : tracer.scopeManager().active().span();
+    this.span = tracer.scopeManager().active() == null ? null : tracer.scopeManager().active().span();
   }
 
   @Override
   public V call() throws Exception {
-    Scope scope = continuation == null ? null : tracer.scopeManager().activate(continuation, false);
+    Scope scope = span == null ? null : tracer.scopeManager().activate(span, false);
     try {
       return delegate.call();
     } finally {
