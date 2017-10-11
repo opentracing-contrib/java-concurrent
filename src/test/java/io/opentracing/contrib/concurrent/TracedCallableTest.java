@@ -16,13 +16,13 @@ import io.opentracing.mock.MockSpan;
 public class TracedCallableTest extends AbstractConcurrentTest {
 
   protected <V> Callable<V> toTraced(Callable<V> callable) {
-    return new TracedCallable<V>(callable, mockTracer.activeSpan());
+    return new TracedCallable<V>(callable, mockTracer);
   }
 
   @Test
   public void testTracedCallable() throws InterruptedException, ExecutionException {
     MockSpan parent = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parent);
+    mockTracer.scopeManager().activate(parent, true);
 
     FutureTask<Void> futureTask = new FutureTask<Void>(toTraced(new TestCallable()));
     Thread thread = createThread(futureTask);

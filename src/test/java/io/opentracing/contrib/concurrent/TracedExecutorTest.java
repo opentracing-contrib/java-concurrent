@@ -19,7 +19,7 @@ public class TracedExecutorTest extends AbstractConcurrentTest {
     Executor executor = new TracedExecutor(Executors.newFixedThreadPool(10), mockTracer);
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executor.execute(new TestRunnable());
 
     countDownLatch.await();

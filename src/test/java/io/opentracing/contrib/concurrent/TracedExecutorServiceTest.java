@@ -29,7 +29,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.execute(new TestRunnable());
 
     countDownLatch.await();
@@ -42,7 +42,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.submit(new TestRunnable());
 
     countDownLatch.await();
@@ -55,7 +55,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.submit(new TestRunnable(), new Object());
 
     countDownLatch.await();
@@ -68,7 +68,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.submit(new TestCallable());
 
     countDownLatch.await();
@@ -81,7 +81,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     countDownLatch = new CountDownLatch(2);
     executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()));
 
@@ -95,7 +95,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     countDownLatch = new CountDownLatch(2);
     executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()), 1, TimeUnit.SECONDS);
 
@@ -109,7 +109,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.invokeAny(Arrays.asList(new TestCallable()), 1, TimeUnit.SECONDS);
 
     countDownLatch.await();
@@ -122,7 +122,7 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
     executorService.invokeAny(Arrays.asList(new TestCallable()));
 
     countDownLatch.await();
