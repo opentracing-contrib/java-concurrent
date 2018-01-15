@@ -4,7 +4,7 @@
 
   <groupId>io.opentracing.contrib</groupId>
   <artifactId>opentracing-concurrent</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>OpenTracing instrumentation for JDK concurrent package</description>
@@ -39,7 +39,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.junit>4.12</version.junit>
-    <version.io.opentracing>0.30.0</version.io.opentracing>
+    <version.io.opentracing>0.31.0</version.io.opentracing>
 
     <!-- plugins -->
     <version.maven-deploy-plugin>2.8.2</version.maven-deploy-plugin>

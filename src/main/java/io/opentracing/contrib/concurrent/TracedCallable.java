@@ -1,8 +1,9 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
-import io.opentracing.NoopActiveSpanSource.NoopContinuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+
 import java.util.concurrent.Callable;
 
 /**
@@ -11,20 +12,24 @@ import java.util.concurrent.Callable;
 public class TracedCallable<V> implements Callable<V> {
 
   private final Callable<V> delegate;
-  private final Continuation continuation;
+  private final Span span;
+  private final Tracer tracer;
 
-  public TracedCallable(Callable<V> delegate, ActiveSpan activeSpan) {
+  public TracedCallable(Callable<V> delegate, Tracer tracer) {
     this.delegate = delegate;
-    this.continuation = activeSpan != null ? activeSpan.capture() : NoopContinuation.INSTANCE;
+    this.tracer = tracer;
+    this.span = tracer.activeSpan();
   }
 
   @Override
   public V call() throws Exception {
-    ActiveSpan activeSpan = continuation.activate();
+    Scope scope = span == null ? null : tracer.scopeManager().activate(span, false);
     try {
       return delegate.call();
     } finally {
-      activeSpan.close();
+      if (scope != null) {
+        scope.close();
+      }
     }
   }
 }

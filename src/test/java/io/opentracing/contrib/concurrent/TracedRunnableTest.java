@@ -12,13 +12,13 @@ import io.opentracing.mock.MockSpan;
 public class TracedRunnableTest extends AbstractConcurrentTest {
 
   protected Runnable toTraced(Runnable runnable) {
-    return new TracedRunnable(runnable, mockTracer.activeSpan());
+    return new TracedRunnable(runnable, mockTracer);
   }
 
   @Test
   public void testTracedRunnable() throws InterruptedException {
     MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.makeActive(parentSpan);
+    mockTracer.scopeManager().activate(parentSpan, true);
 
     Thread thread = createThread(toTraced(new TestRunnable()));
     thread.start();
