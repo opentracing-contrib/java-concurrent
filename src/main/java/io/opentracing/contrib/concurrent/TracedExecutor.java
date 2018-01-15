@@ -21,7 +21,7 @@ public class TracedExecutor implements Executor {
 
   @Override
   public void execute(Runnable runnable) {
-    delegate.execute(tracer.scopeManager().active() == null ? runnable :
+    delegate.execute(tracer.activeSpan() == null ? runnable :
       new TracedRunnable(runnable, tracer));
   }
 }

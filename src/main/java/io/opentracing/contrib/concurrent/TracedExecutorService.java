@@ -51,19 +51,19 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public <T> Future<T> submit(Callable<T> callable) {
-    return delegate.submit(tracer.scopeManager().active() == null ? callable :
+    return delegate.submit(tracer.activeSpan() == null ? callable :
         new TracedCallable<T>(callable, tracer));
   }
 
   @Override
   public <T> Future<T> submit(Runnable runnable, T t) {
-    return delegate.submit(tracer.scopeManager().active() == null ? runnable :
+    return delegate.submit(tracer.activeSpan() == null ? runnable :
         new TracedRunnable(runnable, tracer), t);
   }
 
   @Override
   public Future<?> submit(Runnable runnable) {
-    return delegate.submit(tracer.scopeManager().active() == null ? runnable :
+    return delegate.submit(tracer.activeSpan() == null ? runnable :
         new TracedRunnable(runnable, tracer));
   }
 
@@ -95,7 +95,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
     List<Callable<T>> tracedCallables = new ArrayList<Callable<T>>(delegate.size());
 
     for (Callable<T> callable: delegate) {
-      tracedCallables.add(tracer.scopeManager().active() == null ? callable :
+      tracedCallables.add(tracer.activeSpan() == null ? callable :
           new TracedCallable<T>(callable, tracer));
     }
 

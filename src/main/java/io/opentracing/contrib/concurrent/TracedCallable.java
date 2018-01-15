@@ -18,7 +18,7 @@ public class TracedCallable<V> implements Callable<V> {
   public TracedCallable(Callable<V> delegate, Tracer tracer) {
     this.delegate = delegate;
     this.tracer = tracer;
-    this.span = tracer.scopeManager().active() == null ? null : tracer.scopeManager().active().span();
+    this.span = tracer.activeSpan();
   }
 
   @Override
