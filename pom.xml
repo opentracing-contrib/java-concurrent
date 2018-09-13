@@ -4,7 +4,7 @@
 
   <groupId>io.opentracing.contrib</groupId>
   <artifactId>opentracing-concurrent</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1-SNAPSHOT</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>OpenTracing instrumentation for JDK concurrent package</description>
@@ -14,7 +14,7 @@
     <url>https://github.com/opentracing-contrib/java-concurrent</url>
     <connection>scm:git:https://github.com/opentracing-contrib/java-concurrent.git</connection>
     <developerConnection>scm:git:https://github.com/opentracing-contrib/java-concurrent.git</developerConnection>
-    <tag>0.2.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <licenses>
