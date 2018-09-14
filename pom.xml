@@ -34,8 +34,8 @@
   </developers>
 
   <properties>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.junit>4.12</version.junit>
@@ -48,6 +48,7 @@
     <version.maven-javadoc-plugin>2.10.4</version.maven-javadoc-plugin>
     <version.io.takari-maven>0.3.4</version.io.takari-maven>
     <version.io.zikin.centralsync-maven-plugin>0.1.0</version.io.zikin.centralsync-maven-plugin>
+    <version.awaitility>3.0.0</version.awaitility>
   </properties>
 
   <dependencyManagement>
@@ -92,6 +93,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>${version.awaitility}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.opentracing</groupId>
       <artifactId>opentracing-mock</artifactId>
       <scope>test</scope>
@@ -99,7 +106,6 @@
     <dependency>
       <groupId>io.opentracing</groupId>
       <artifactId>opentracing-util</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
