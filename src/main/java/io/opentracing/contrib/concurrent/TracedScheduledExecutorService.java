@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 public class TracedScheduledExecutorService extends TracedExecutorService implements ScheduledExecutorService {
 
   private final ScheduledExecutorService delegate;
-  private final boolean traceWithActiveSpanOnly;
 
   public TracedScheduledExecutorService(ScheduledExecutorService delegate, Tracer tracer) {
     this(delegate, tracer, true);
@@ -26,15 +25,11 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
       boolean traceWithActiveSpanOnly) {
     super(delegate, tracer, traceWithActiveSpanOnly);
     this.delegate = delegate;
-    this.traceWithActiveSpanOnly = traceWithActiveSpanOnly;
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("schedule").startActive(true);
-    }
+    Scope scope = createScope("schedule");
     try {
       return delegate.schedule(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer), delay, timeUnit);
@@ -47,10 +42,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
 
   @Override
   public <T> ScheduledFuture<T> schedule(Callable<T> callable, long delay, TimeUnit timeUnit) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("schedule").startActive(true);
-    }
+    Scope scope = createScope("schedule");
     try {
       return delegate.schedule(tracer.activeSpan() == null ? callable :
           new TracedCallable<T>(callable, tracer), delay, timeUnit);
@@ -64,10 +56,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period,
       TimeUnit timeUnit) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("scheduleAtFixedRate").startActive(true);
-    }
+    Scope scope = createScope("scheduleAtFixedRate");
     try {
       return delegate.scheduleAtFixedRate(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer), initialDelay, period, timeUnit);
@@ -81,10 +70,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay,
       TimeUnit timeUnit) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("scheduleWithFixedDelay").startActive(true);
-    }
+    Scope scope = createScope("scheduleWithFixedDelay");
     try {
       return delegate.scheduleWithFixedDelay(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer), initialDelay, delay, timeUnit);

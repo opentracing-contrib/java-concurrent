@@ -21,7 +21,6 @@ import java.util.concurrent.TimeoutException;
 public class TracedExecutorService extends TracedExecutor implements ExecutorService {
 
   private final ExecutorService delegate;
-  private final boolean traceWithActiveSpanOnly;
 
   public TracedExecutorService(ExecutorService delegate, Tracer tracer) {
     this(delegate, tracer, true);
@@ -31,7 +30,6 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
       boolean traceWithActiveSpanOnly) {
     super(delegate, tracer, traceWithActiveSpanOnly);
     this.delegate = delegate;
-    this.traceWithActiveSpanOnly = traceWithActiveSpanOnly;
   }
 
   @Override
@@ -61,10 +59,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public <T> Future<T> submit(Callable<T> callable) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("submit").startActive(true);
-    }
+    Scope scope = createScope("submit");
     try {
       return delegate.submit(tracer.activeSpan() == null ? callable :
           new TracedCallable<T>(callable, tracer));
@@ -77,10 +72,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public <T> Future<T> submit(Runnable runnable, T t) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("submit").startActive(true);
-    }
+    Scope scope = createScope("submit");
     try {
       return delegate.submit(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer), t);
@@ -93,10 +85,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public Future<?> submit(Runnable runnable) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("submit").startActive(true);
-    }
+    Scope scope = createScope("submit");
     try {
       return delegate.submit(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer));
@@ -110,10 +99,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection)
       throws InterruptedException {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("invokeAll").startActive(true);
-    }
+    Scope scope = createScope("invokeAll");
     try {
       return delegate.invokeAll(toTraced(collection));
     } finally {
@@ -126,10 +112,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection, long l,
       TimeUnit timeUnit) throws InterruptedException {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("invokeAll").startActive(true);
-    }
+    Scope scope = createScope("invokeAll");
     try {
       return delegate.invokeAll(toTraced(collection), l, timeUnit);
     } finally {
@@ -142,10 +125,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection)
       throws InterruptedException, ExecutionException {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("invokeAny").startActive(true);
-    }
+    Scope scope = createScope("invokeAny");
     try {
       return delegate.invokeAny(toTraced(collection));
     } finally {
@@ -158,10 +138,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("invokeAny").startActive(true);
-    }
+    Scope scope = createScope("invokeAny");
     try {
       return delegate.invokeAny(toTraced(collection), l, timeUnit);
     } finally {

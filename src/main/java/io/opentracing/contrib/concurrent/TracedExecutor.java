@@ -28,10 +28,7 @@ public class TracedExecutor implements Executor {
 
   @Override
   public void execute(Runnable runnable) {
-    Scope scope = null;
-    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      scope = tracer.buildSpan("execute").startActive(true);
-    }
+    Scope scope = createScope("execute");
     try {
       delegate.execute(tracer.activeSpan() == null ? runnable :
           new TracedRunnable(runnable, tracer));
@@ -40,5 +37,12 @@ public class TracedExecutor implements Executor {
         scope.close();
       }
     }
+  }
+
+  Scope createScope(String operationName) {
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      return tracer.buildSpan(operationName).startActive(true);
+    }
+    return null;
   }
 }
