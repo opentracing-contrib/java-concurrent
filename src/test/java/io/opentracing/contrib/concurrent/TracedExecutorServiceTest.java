@@ -24,6 +24,10 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     return new TracedExecutorService(executorService, mockTracer);
   }
 
+  protected ExecutorService toTracedNoParent(ExecutorService executorService) {
+    return new TracedExecutorService(executorService, mockTracer, false);
+  }
+
   @Test
   public void testExecuteRunnable() throws InterruptedException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
@@ -35,6 +39,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     countDownLatch.await();
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
+  }
+
+  @Test
+  public void testExecuteRunnableNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.execute(new TestRunnable());
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
   }
 
   @Test
@@ -51,6 +63,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
   }
 
   @Test
+  public void testSubmitRunnableNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.submit(new TestRunnable());
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
+  }
+
+  @Test
   public void testSubmitRunnableTyped() throws InterruptedException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
@@ -64,6 +84,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
   }
 
   @Test
+  public void testSubmitRunnableTypedNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.submit(new TestRunnable(), new Object());
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
+  }
+
+  @Test
   public void testSubmitCallable() throws InterruptedException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
@@ -74,6 +102,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     countDownLatch.await();
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
+  }
+
+  @Test
+  public void testSubmitCallableNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.submit(new TestCallable());
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
   }
 
   @Test
@@ -91,6 +127,15 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
   }
 
   @Test
+  public void testInvokeAllNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    countDownLatch = new CountDownLatch(2);
+    executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()));
+    countDownLatch.await();
+    assertEquals(3, mockTracer.finishedSpans().size());
+  }
+
+  @Test
   public void testInvokeAllTimeUnit() throws InterruptedException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
@@ -102,6 +147,15 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     countDownLatch.await();
     assertParentSpan(parentSpan);
     assertEquals(2, mockTracer.finishedSpans().size());
+  }
+
+  @Test
+  public void testInvokeAllTimeUnitNoParent() throws InterruptedException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    countDownLatch = new CountDownLatch(2);
+    executorService.invokeAll(Arrays.asList(new TestCallable(), new TestCallable()), 1, TimeUnit.SECONDS);
+    countDownLatch.await();
+    assertEquals(3, mockTracer.finishedSpans().size());
   }
 
   @Test
@@ -118,6 +172,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
   }
 
   @Test
+  public void testInvokeAnyTimeUnitNoParent() throws InterruptedException, ExecutionException, TimeoutException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.invokeAny(Arrays.asList(new TestCallable()), 1, TimeUnit.SECONDS);
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
+  }
+
+  @Test
   public void testInvokeAny() throws InterruptedException, ExecutionException {
     ExecutorService executorService = toTraced(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
@@ -128,6 +190,14 @@ public class TracedExecutorServiceTest extends AbstractConcurrentTest {
     countDownLatch.await();
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
+  }
+
+  @Test
+  public void testInvokeAnyNoParent() throws InterruptedException, ExecutionException {
+    ExecutorService executorService = toTracedNoParent(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
+    executorService.invokeAny(Arrays.asList(new TestCallable()));
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
   }
 
 }

@@ -1,5 +1,7 @@
 package io.opentracing.contrib.concurrent;
 
+import io.opentracing.Scope;
+import io.opentracing.Tracer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,18 +12,26 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.opentracing.Tracer;
-
 /**
  * @author Pavol Loffay
+ *
+ * Executor which propagates span from parent thread to submitted.
+ * Optionally it creates parent span if traceWithActiveSpanOnly = false.
  */
 public class TracedExecutorService extends TracedExecutor implements ExecutorService {
 
   private final ExecutorService delegate;
+  private final boolean traceWithActiveSpanOnly;
 
   public TracedExecutorService(ExecutorService delegate, Tracer tracer) {
-    super(delegate, tracer);
+    this(delegate, tracer, true);
+  }
+
+  public TracedExecutorService(ExecutorService delegate, Tracer tracer,
+      boolean traceWithActiveSpanOnly) {
+    super(delegate, tracer, traceWithActiveSpanOnly);
     this.delegate = delegate;
+    this.traceWithActiveSpanOnly = traceWithActiveSpanOnly;
   }
 
   @Override
@@ -51,44 +61,114 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public <T> Future<T> submit(Callable<T> callable) {
-    return delegate.submit(tracer.activeSpan() == null ? callable :
-        new TracedCallable<T>(callable, tracer));
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("submit").startActive(true);
+    }
+    try {
+      return delegate.submit(tracer.activeSpan() == null ? callable :
+          new TracedCallable<T>(callable, tracer));
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public <T> Future<T> submit(Runnable runnable, T t) {
-    return delegate.submit(tracer.activeSpan() == null ? runnable :
-        new TracedRunnable(runnable, tracer), t);
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("submit").startActive(true);
+    }
+    try {
+      return delegate.submit(tracer.activeSpan() == null ? runnable :
+          new TracedRunnable(runnable, tracer), t);
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public Future<?> submit(Runnable runnable) {
-    return delegate.submit(tracer.activeSpan() == null ? runnable :
-        new TracedRunnable(runnable, tracer));
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("submit").startActive(true);
+    }
+    try {
+      return delegate.submit(tracer.activeSpan() == null ? runnable :
+          new TracedRunnable(runnable, tracer));
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection)
       throws InterruptedException {
-    return delegate.invokeAll(toTraced(collection));
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("invokeAll").startActive(true);
+    }
+    try {
+      return delegate.invokeAll(toTraced(collection));
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection, long l,
       TimeUnit timeUnit) throws InterruptedException {
-    return delegate.invokeAll(toTraced(collection), l, timeUnit);
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("invokeAll").startActive(true);
+    }
+    try {
+      return delegate.invokeAll(toTraced(collection), l, timeUnit);
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection)
       throws InterruptedException, ExecutionException {
-    return delegate.invokeAny(toTraced(collection));
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("invokeAny").startActive(true);
+    }
+    try {
+      return delegate.invokeAny(toTraced(collection));
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    return delegate.invokeAny(toTraced(collection), l, timeUnit);
+    Scope scope = null;
+    if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
+      scope = tracer.buildSpan("invokeAny").startActive(true);
+    }
+    try {
+      return delegate.invokeAny(toTraced(collection), l, timeUnit);
+    } finally {
+      if (scope != null) {
+        scope.close();
+      }
+    }
   }
 
   private <T> Collection<? extends Callable<T>> toTraced(Collection<? extends Callable<T>> delegate) {
