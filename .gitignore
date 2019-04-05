@@ -30,3 +30,6 @@ target
 .classpath
 .settings
 
+# Intellij Idea
+.idea/
+*.iml

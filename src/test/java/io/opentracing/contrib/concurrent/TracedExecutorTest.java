@@ -26,4 +26,12 @@ public class TracedExecutorTest extends AbstractConcurrentTest {
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
   }
+
+  @Test
+  public void testExecuteNoParent() throws InterruptedException {
+    Executor executor = new TracedExecutor(Executors.newFixedThreadPool(10), mockTracer, false);
+    executor.execute(new TestRunnable());
+    countDownLatch.await();
+    assertEquals(2, mockTracer.finishedSpans().size());
+  }
 }
