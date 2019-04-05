@@ -17,7 +17,7 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 		return new TracedScheduledExecutorService(scheduledExecutorService, mockTracer);
 	}
 
-	protected ScheduledExecutorService toTracedNoParent(ScheduledExecutorService scheduledExecutorService) {
+	protected ScheduledExecutorService toTracedNoParentRequired(ScheduledExecutorService scheduledExecutorService) {
 		return new TracedScheduledExecutorService(scheduledExecutorService, mockTracer, false);
 	}
 
@@ -36,7 +36,7 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 
 	@Test
 	public void scheduleRunnableTestNoParent() throws InterruptedException {
-		ScheduledExecutorService executorService = toTracedNoParent(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
+		ScheduledExecutorService executorService = toTracedNoParentRequired(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 		executorService.schedule(new TestRunnable(), 300, TimeUnit.MILLISECONDS);
 		countDownLatch.await();
 		assertEquals(2, mockTracer.finishedSpans().size());
@@ -57,7 +57,7 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 
 	@Test
 	public void scheduleCallableTestNoParent() throws InterruptedException {
-		ScheduledExecutorService executorService = toTracedNoParent(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
+		ScheduledExecutorService executorService = toTracedNoParentRequired(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 		executorService.schedule(new TestCallable(), 300, TimeUnit.MILLISECONDS);
 		countDownLatch.await();
 		assertEquals(2, mockTracer.finishedSpans().size());
@@ -81,7 +81,7 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 	@Test
 	public void scheduleAtFixedRateTestNoParent() throws InterruptedException {
 		countDownLatch = new CountDownLatch(2);
-		ScheduledExecutorService executorService = toTracedNoParent(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
+		ScheduledExecutorService executorService = toTracedNoParentRequired(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 		executorService.scheduleAtFixedRate(new TestRunnable(), 0, 300, TimeUnit.MILLISECONDS);
 		countDownLatch.await();
 		executorService.shutdown();
@@ -106,7 +106,7 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 	@Test
 	public void scheduleWithFixedDelayTestNoParent() throws InterruptedException {
 		countDownLatch = new CountDownLatch(2);
-		ScheduledExecutorService executorService = toTracedNoParent(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
+		ScheduledExecutorService executorService = toTracedNoParentRequired(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 		executorService.scheduleWithFixedDelay(new TestRunnable(), 0, 300, TimeUnit.MILLISECONDS);
 		countDownLatch.await();
 		executorService.shutdown();
