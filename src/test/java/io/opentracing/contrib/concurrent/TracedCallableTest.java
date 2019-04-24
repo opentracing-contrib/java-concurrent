@@ -2,6 +2,7 @@ package io.opentracing.contrib.concurrent;
 
 import static org.junit.Assert.assertEquals;
 
+import io.opentracing.Scope;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -21,14 +22,15 @@ public class TracedCallableTest extends AbstractConcurrentTest {
 
   @Test
   public void testTracedCallable() throws InterruptedException, ExecutionException {
-    MockSpan parent = mockTracer.buildSpan("foo").startManual();
-    mockTracer.scopeManager().activate(parent, true);
+    MockSpan parent = mockTracer.buildSpan("foo").start();
+    Scope scope = mockTracer.scopeManager().activate(parent);
 
     FutureTask<Void> futureTask = new FutureTask<Void>(toTraced(new TestCallable()));
     Thread thread = createThread(futureTask);
     thread.start();
     futureTask.get();
     thread.join();
+    scope.close();
 
     assertParentSpan(parent);
     assertEquals(1, mockTracer.finishedSpans().size());

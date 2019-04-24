@@ -1,6 +1,6 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import java.util.concurrent.Executor;
 
@@ -28,20 +28,21 @@ public class TracedExecutor implements Executor {
 
   @Override
   public void execute(Runnable runnable) {
-    Scope scope = createScope("execute");
+    Span span = createSpan("execute");
     try {
-      delegate.execute(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer));
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      delegate.execute(toActivate == null ? runnable : new TracedRunnable(runnable, tracer, toActivate));
     } finally {
-      if (scope != null) {
-        scope.close();
+      // close the span if created
+      if (span != null) {
+        span.finish();
       }
     }
   }
 
-  Scope createScope(String operationName) {
+  Span createSpan(String operationName) {
     if (tracer.activeSpan() == null && !traceWithActiveSpanOnly) {
-      return tracer.buildSpan(operationName).startActive(true);
+      return tracer.buildSpan(operationName).start();
     }
     return null;
   }

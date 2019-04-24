@@ -14,14 +14,18 @@ public class TracedRunnable implements Runnable {
   private final Tracer tracer;
 
   public TracedRunnable(Runnable delegate, Tracer tracer) {
+    this(delegate, tracer, tracer.activeSpan());
+  }
+
+  public TracedRunnable(Runnable delegate, Tracer tracer, Span span) {
     this.delegate = delegate;
     this.tracer = tracer;
-    this.span = tracer.activeSpan();
+    this.span = span;
   }
 
   @Override
   public void run() {
-    Scope scope = span == null ? null : tracer.scopeManager().activate(span, false);
+    Scope scope = span == null ? null : tracer.scopeManager().activate(span);
     try {
       delegate.run();
     } finally {

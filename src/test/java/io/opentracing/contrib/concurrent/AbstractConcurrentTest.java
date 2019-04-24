@@ -21,9 +21,7 @@ public abstract class AbstractConcurrentTest {
     @Override
     public void run() {
       try {
-        mockTracer.buildSpan("childRunnable")
-            .startActive(true)
-            .close();
+        mockTracer.buildSpan("childRunnable").start().finish();
       } finally {
         countDownLatch.countDown();
       }
@@ -34,9 +32,7 @@ public abstract class AbstractConcurrentTest {
     @Override
     public Void call() throws Exception {
       try {
-        mockTracer.buildSpan("childCallable")
-            .startActive(true)
-            .close();
+        mockTracer.buildSpan("childCallable").start().finish();
       } finally {
         countDownLatch.countDown();
       }

@@ -16,14 +16,18 @@ public class TracedCallable<V> implements Callable<V> {
   private final Tracer tracer;
 
   public TracedCallable(Callable<V> delegate, Tracer tracer) {
+    this(delegate, tracer, tracer.activeSpan());
+  }
+
+  public TracedCallable(Callable<V> delegate, Tracer tracer, Span span) {
     this.delegate = delegate;
     this.tracer = tracer;
-    this.span = tracer.activeSpan();
+    this.span = span;
   }
 
   @Override
   public V call() throws Exception {
-    Scope scope = span == null ? null : tracer.scopeManager().activate(span, false);
+    Scope scope = span == null ? null : tracer.scopeManager().activate(span);
     try {
       return delegate.call();
     } finally {

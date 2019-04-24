@@ -1,6 +1,6 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TracedScheduledExecutorService extends TracedExecutorService implements ScheduledExecutorService {
 
-	private final ScheduledExecutorService delegate;
+  private final ScheduledExecutorService delegate;
 
   public TracedScheduledExecutorService(ScheduledExecutorService delegate, Tracer tracer) {
     this(delegate, tracer, true);
@@ -29,26 +29,28 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
 
   @Override
   public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-    Scope scope = createScope("schedule");
+    Span span = createSpan("schedule");
     try {
+      Span toActivate = span != null ? span : tracer.activeSpan();
       return delegate.schedule(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer), delay, timeUnit);
+          new TracedRunnable(runnable, tracer, toActivate), delay, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
 
   @Override
   public <T> ScheduledFuture<T> schedule(Callable<T> callable, long delay, TimeUnit timeUnit) {
-    Scope scope = createScope("schedule");
+    Span span = createSpan("schedule");
     try {
+      Span toActivate = span != null ? span : tracer.activeSpan();
       return delegate.schedule(tracer.activeSpan() == null ? callable :
-          new TracedCallable<T>(callable, tracer), delay, timeUnit);
+          new TracedCallable<T>(callable, tracer, toActivate), delay, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -56,13 +58,14 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period,
       TimeUnit timeUnit) {
-    Scope scope = createScope("scheduleAtFixedRate");
+    Span span = createSpan("scheduleAtFixedRate");
     try {
+      Span toActivate = span != null ? span : tracer.activeSpan();
       return delegate.scheduleAtFixedRate(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer), initialDelay, period, timeUnit);
+          new TracedRunnable(runnable, tracer, toActivate), initialDelay, period, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -70,13 +73,14 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay,
       TimeUnit timeUnit) {
-    Scope scope = createScope("scheduleWithFixedDelay");
+    Span span = createSpan("scheduleWithFixedDelay");
     try {
+      Span toActivate = span != null ? span : tracer.activeSpan();
       return delegate.scheduleWithFixedDelay(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer), initialDelay, delay, timeUnit);
+          new TracedRunnable(runnable, tracer, toActivate), initialDelay, delay, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }

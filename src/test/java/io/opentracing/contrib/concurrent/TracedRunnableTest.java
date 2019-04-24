@@ -2,6 +2,7 @@ package io.opentracing.contrib.concurrent;
 
 import static org.junit.Assert.assertEquals;
 
+import io.opentracing.Scope;
 import org.junit.Test;
 
 import io.opentracing.mock.MockSpan;
@@ -17,12 +18,13 @@ public class TracedRunnableTest extends AbstractConcurrentTest {
 
   @Test
   public void testTracedRunnable() throws InterruptedException {
-    MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-    mockTracer.scopeManager().activate(parentSpan, true);
+    MockSpan parentSpan = mockTracer.buildSpan("foo").start();
+    Scope scope = mockTracer.scopeManager().activate(parentSpan);
 
     Thread thread = createThread(toTraced(new TestRunnable()));
     thread.start();
     thread.join();
+    scope.close();
 
     assertParentSpan(parentSpan);
     assertEquals(1, mockTracer.finishedSpans().size());
