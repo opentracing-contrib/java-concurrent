@@ -1,6 +1,5 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import java.util.ArrayList;
@@ -92,7 +91,7 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
     try {
       Span toActivate = span != null ? span : tracer.activeSpan();
       return delegate.submit(toActivate == null ? runnable :
-          new TracedRunnable(runnable, tracer), toActivate);
+          new TracedRunnable(runnable, tracer, toActivate));
     } finally {
       if (span != null) {
         span.finish();
