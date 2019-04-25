@@ -1,5 +1,6 @@
 package io.opentracing.contrib.concurrent;
 
+import io.opentracing.Scope;
 import io.opentracing.mock.MockSpan;
 import org.junit.Test;
 
@@ -25,9 +26,10 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 	public void scheduleRunnableTest() throws InterruptedException {
 		ScheduledExecutorService executorService = toTraced(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 
-		MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-		mockTracer.scopeManager().activate(parentSpan, true);
+		MockSpan parentSpan = mockTracer.buildSpan("foo").start();
+		Scope scope = mockTracer.scopeManager().activate(parentSpan);
 		executorService.schedule(new TestRunnable(), 300, TimeUnit.MILLISECONDS);
+		scope.close();
 
 		countDownLatch.await();
 		assertParentSpan(parentSpan);
@@ -46,9 +48,10 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 	public void scheduleCallableTest() throws InterruptedException {
 		ScheduledExecutorService executorService = toTraced(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 
-		MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-		mockTracer.scopeManager().activate(parentSpan, true);
+		MockSpan parentSpan = mockTracer.buildSpan("foo").start();
+		Scope scope = mockTracer.scopeManager().activate(parentSpan);
 		executorService.schedule(new TestCallable(), 300, TimeUnit.MILLISECONDS);
+		scope.close();
 
 		countDownLatch.await();
 		assertParentSpan(parentSpan);
@@ -68,9 +71,10 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 		countDownLatch = new CountDownLatch(2);
 		ScheduledExecutorService executorService = toTraced(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 
-		MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-		mockTracer.scopeManager().activate(parentSpan, true);
+		MockSpan parentSpan = mockTracer.buildSpan("foo").start();
+		Scope scope = mockTracer.scopeManager().activate(parentSpan);
 		executorService.scheduleAtFixedRate(new TestRunnable(), 0, 300, TimeUnit.MILLISECONDS);
+		scope.close();
 
 		countDownLatch.await();
 		executorService.shutdown();
@@ -93,9 +97,10 @@ public class TracedScheduledExecutorServiceTest extends AbstractConcurrentTest {
 		countDownLatch = new CountDownLatch(2);
 		ScheduledExecutorService executorService = toTraced(Executors.newScheduledThreadPool(NUMBER_OF_THREADS));
 
-		MockSpan parentSpan = mockTracer.buildSpan("foo").startManual();
-		mockTracer.scopeManager().activate(parentSpan, true);
+		MockSpan parentSpan = mockTracer.buildSpan("foo").start();
+		Scope scope = mockTracer.scopeManager().activate(parentSpan);
 		executorService.scheduleWithFixedDelay(new TestRunnable(), 0, 300, TimeUnit.MILLISECONDS);
+		scope.close();
 
 		countDownLatch.await();
 		executorService.shutdown();

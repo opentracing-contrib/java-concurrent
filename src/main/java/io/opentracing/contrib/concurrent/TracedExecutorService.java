@@ -1,6 +1,6 @@
 package io.opentracing.contrib.concurrent;
 
-import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,39 +59,42 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
 
   @Override
   public <T> Future<T> submit(Callable<T> callable) {
-    Scope scope = createScope("submit");
+    Span span = createSpan("submit");
     try {
-      return delegate.submit(tracer.activeSpan() == null ? callable :
-          new TracedCallable<T>(callable, tracer));
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.submit(toActivate == null ? callable :
+          new TracedCallable<T>(callable, tracer, toActivate));
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
 
   @Override
   public <T> Future<T> submit(Runnable runnable, T t) {
-    Scope scope = createScope("submit");
+    Span span = createSpan("submit");
     try {
-      return delegate.submit(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer), t);
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.submit(toActivate == null ? runnable :
+          new TracedRunnable(runnable, tracer, toActivate), t);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
 
   @Override
   public Future<?> submit(Runnable runnable) {
-    Scope scope = createScope("submit");
+    Span span = createSpan("submit");
     try {
-      return delegate.submit(tracer.activeSpan() == null ? runnable :
-          new TracedRunnable(runnable, tracer));
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.submit(toActivate == null ? runnable :
+          new TracedRunnable(runnable, tracer, toActivate));
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -99,12 +102,13 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection)
       throws InterruptedException {
-    Scope scope = createScope("invokeAll");
+    Span span = createSpan("invokeAll");
     try {
-      return delegate.invokeAll(toTraced(collection));
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.invokeAll(toTraced(collection, toActivate));
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -112,12 +116,13 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection, long l,
       TimeUnit timeUnit) throws InterruptedException {
-    Scope scope = createScope("invokeAll");
+    Span span = createSpan("invokeAll");
     try {
-      return delegate.invokeAll(toTraced(collection), l, timeUnit);
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.invokeAll(toTraced(collection, toActivate), l, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -125,12 +130,13 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection)
       throws InterruptedException, ExecutionException {
-    Scope scope = createScope("invokeAny");
+    Span span = createSpan("invokeAny");
     try {
-      return delegate.invokeAny(toTraced(collection));
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.invokeAny(toTraced(collection, toActivate));
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
@@ -138,22 +144,23 @@ public class TracedExecutorService extends TracedExecutor implements ExecutorSer
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    Scope scope = createScope("invokeAny");
+    Span span = createSpan("invokeAny");
     try {
-      return delegate.invokeAny(toTraced(collection), l, timeUnit);
+      Span toActivate = span != null ? span : tracer.activeSpan();
+      return delegate.invokeAny(toTraced(collection, toActivate), l, timeUnit);
     } finally {
-      if (scope != null) {
-        scope.close();
+      if (span != null) {
+        span.finish();
       }
     }
   }
 
-  private <T> Collection<? extends Callable<T>> toTraced(Collection<? extends Callable<T>> delegate) {
+  private <T> Collection<? extends Callable<T>> toTraced(Collection<? extends Callable<T>> delegate, Span toActivate) {
     List<Callable<T>> tracedCallables = new ArrayList<Callable<T>>(delegate.size());
 
     for (Callable<T> callable: delegate) {
-      tracedCallables.add(tracer.activeSpan() == null ? callable :
-          new TracedCallable<T>(callable, tracer));
+      tracedCallables.add(toActivate == null ? callable :
+          new TracedCallable<T>(callable, tracer, toActivate));
     }
 
     return tracedCallables;

@@ -39,7 +39,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.junit>4.12</version.junit>
-    <version.io.opentracing>0.31.0</version.io.opentracing>
+    <version.io.opentracing>0.32.0</version.io.opentracing>
 
     <!-- plugins -->
     <version.maven-deploy-plugin>2.8.2</version.maven-deploy-plugin>
