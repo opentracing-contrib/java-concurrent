@@ -32,7 +32,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
     Span span = createSpan("schedule");
     try {
       Span toActivate = span != null ? span : tracer.activeSpan();
-      return delegate.schedule(tracer.activeSpan() == null ? runnable :
+      return delegate.schedule(toActivate == null ? runnable :
           new TracedRunnable(runnable, tracer, toActivate), delay, timeUnit);
     } finally {
       if (span != null) {
@@ -46,7 +46,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
     Span span = createSpan("schedule");
     try {
       Span toActivate = span != null ? span : tracer.activeSpan();
-      return delegate.schedule(tracer.activeSpan() == null ? callable :
+      return delegate.schedule(toActivate == null ? callable :
           new TracedCallable<T>(callable, tracer, toActivate), delay, timeUnit);
     } finally {
       if (span != null) {
@@ -61,7 +61,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
     Span span = createSpan("scheduleAtFixedRate");
     try {
       Span toActivate = span != null ? span : tracer.activeSpan();
-      return delegate.scheduleAtFixedRate(tracer.activeSpan() == null ? runnable :
+      return delegate.scheduleAtFixedRate(toActivate == null ? runnable :
           new TracedRunnable(runnable, tracer, toActivate), initialDelay, period, timeUnit);
     } finally {
       if (span != null) {
@@ -76,7 +76,7 @@ public class TracedScheduledExecutorService extends TracedExecutorService implem
     Span span = createSpan("scheduleWithFixedDelay");
     try {
       Span toActivate = span != null ? span : tracer.activeSpan();
-      return delegate.scheduleWithFixedDelay(tracer.activeSpan() == null ? runnable :
+      return delegate.scheduleWithFixedDelay(toActivate == null ? runnable :
           new TracedRunnable(runnable, tracer, toActivate), initialDelay, delay, timeUnit);
     } finally {
       if (span != null) {
